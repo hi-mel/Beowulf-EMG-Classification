@@ -3,7 +3,7 @@ import csv
 import numpy as np
 from linear_classifier import LinearClassifier
 
-master_file_name = 'master_training_data.csv'
+master_file_name = '../EMG_Training_Data/master_training_data.csv'
 
 def get_master_data():
     f = open(master_file_name, 'r')
@@ -13,13 +13,15 @@ def get_master_data():
 
     data = np.array(data)
     data = data.astype(float)
+    
     X = data[:,:-1]
-    X /= np.max(X)
+    X /= 1000.0
     add_ones = np.ones((X.shape[0],X.shape[1]+1))
     add_ones[:,:-1] = X
     
     X = add_ones
     y = data[:,-1].astype(int)
+
     return X, y
 
 def split_data(X, y):
@@ -82,10 +84,13 @@ def main():
         train_accuracy, val_accuracy = results[(lr,rs)]
         print('lr %e reg %e train_accuracy %f val_accuracy %f' % (lr, rs, train_accuracy, val_accuracy))
 
+    print(test_X[0])
     y_pred_test = best_model.predict(test_X)
+
     test_accuracy = np.mean(y_pred_test == test_y)
+
     print('This test accuracy: ' + str(test_accuracy))
-    best_model.toFile('rowan_rest_grip_flex_linear_classifier_100p.csv')
+    best_model.toFile('rowan_rest_grip_flex_linear_classifier_3_' + str(int(test_accuracy*100)) + 'p.csv')
 
 if __name__ == '__main__':
     main()
